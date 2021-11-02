@@ -35,6 +35,13 @@ function addItem(e) {
       <button type="button" class="edit-btn"><i class="fas fa-edit"></i></button>
       <button type="button" class="delete-btn"><i class="fas fa-trash"></i></button>
     </div>`
+
+    // NOTE the event listeners for the delete and edit buttons do not exist on page load, therefore we must create the event listeners and query the variables within this section
+    const deleteBtn = element.querySelector('.delete-btn')
+    const editBtn = element.querySelector('.edit-btn')
+    deleteBtn.addEventListener('click', deleteItem)
+    editBtn.addEventListener('click', editItem)
+
     // append child
     list.appendChild(element)
     // display Alert
@@ -66,6 +73,40 @@ function displayAlert(text, action) {
   },1000)
 }
 
+// clear items
+function clearItems() {
+  const items = document.querySelectorAll('.grocery-item')
+
+  if (items.length > 0) {
+    items.forEach(item => {
+      list.removeChild(item)
+    })
+  }
+  container.classList.remove('show-container')
+  displayAlert('emptied the list', 'danger')
+  setBackToDefault()
+  // localStorage.removeItem('list')
+}
+
+//delete function
+function deleteItem (e) {
+  const element = e.currentTarget.parentElement.parentElement
+  const id = element.dataset.id
+  list.removeChild(element)
+
+  if (list.children.length === 0) {
+    container.classList.remove('show-container')
+  }
+
+  displayAlert('item removed', 'danger')
+  setBackToDefault()
+  // remove from local storage
+  // removeFromLocalStorage(id)
+}
+// edit function
+function editItem () {
+  console.log('item edit');
+}
 // set to default
 function setBackToDefault() {
   grocery.value = ''
@@ -76,6 +117,10 @@ function setBackToDefault() {
 
 // ****** LOCAL STORAGE **********
 function addToLocalStorage(id, value) {
-  console.log('added to local storage');
+  // console.log('added to local storage');
+}
+
+function removeFromLocalStorage(id) {
+
 }
 // ****** SETUP ITEMS **********
