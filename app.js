@@ -15,6 +15,8 @@ let editId = ''
 // ****** EVENT LISTENERS **********
 // submit form
 form.addEventListener('submit', addItem)
+// clear the form
+clearBtn.addEventListener('click', clearItems)
 
 // ****** FUNCTIONS **********
 function addItem(e) {
@@ -39,6 +41,10 @@ function addItem(e) {
     displayAlert('item added to the list', 'success')
     // display item
     container.classList.add('show-container')
+    // add to local storage
+    addToLocalStorage(id, value)
+    // set back to default
+    setBackToDefault()
   }
   else if(value && editFlag) {
     console.log('editing');
@@ -60,6 +66,16 @@ function displayAlert(text, action) {
   },1000)
 }
 
-// ****** LOCAL STORAGE **********
+// set to default
+function setBackToDefault() {
+  grocery.value = ''
+  editFlag = false
+  editId = ''
+  submitBtn.textContent = 'submit'
+}
 
+// ****** LOCAL STORAGE **********
+function addToLocalStorage(id, value) {
+  console.log('added to local storage');
+}
 // ****** SETUP ITEMS **********
