@@ -17,6 +17,8 @@ let editId = ''
 form.addEventListener('submit', addItem)
 // clear the form
 clearBtn.addEventListener('click', clearItems)
+// load items
+window.addEventListener('DOMContentLoaded', setupItems)
 
 // ****** FUNCTIONS **********
 function addItem(e) {
@@ -25,25 +27,7 @@ function addItem(e) {
   const id = new Date().getTime().toString() // quick way to get unique id
   
   if (value && !editFlag) {
-    const element = document.createElement('article')
-    element.classList.add('grocery-item')
-    const attribute = document.createAttribute('data-id')
-    attribute.value = id
-    element.setAttributeNode(attribute)
-    element.innerHTML = `<p class="title">${value}</p>
-    <div class="btn-container">
-      <button type="button" class="edit-btn"><i class="fas fa-edit"></i></button>
-      <button type="button" class="delete-btn"><i class="fas fa-trash"></i></button>
-    </div>`
-
-    // NOTE the event listeners for the delete and edit buttons do not exist on page load, therefore we must create the event listeners and query the variables within this section
-    const deleteBtn = element.querySelector('.delete-btn')
-    const editBtn = element.querySelector('.edit-btn')
-    deleteBtn.addEventListener('click', deleteItem)
-    editBtn.addEventListener('click', editItem)
-
-    // append child
-    list.appendChild(element)
+    createListItem(id, value)
     // display Alert
     displayAlert('item added to the list', 'success')
     // display item
@@ -89,7 +73,7 @@ function clearItems() {
   container.classList.remove('show-container')
   displayAlert('emptied the list', 'danger')
   setBackToDefault()
-  // localStorage.removeItem('list')
+  localStorage.removeItem('list')
 }
 
 //delete function
@@ -104,8 +88,7 @@ function deleteItem (e) {
 
   displayAlert('item removed', 'danger')
   setBackToDefault()
-  // remove from local storage
-  // removeFromLocalStorage(id)
+  removeFromLocalStorage(id)
 }
 // edit function
 function editItem (e) {
@@ -128,14 +111,75 @@ function setBackToDefault() {
 
 // ****** LOCAL STORAGE **********
 function addToLocalStorage(id, value) {
-  // console.log('added to local storage');
+  const grocery = {id: id, value: value}
+  // const grocery = {id, value} <-- shorthand if both key and value are the same in ES6
+  let items = getLocalStorage()
+  items.push(grocery)
+  localStorage.setItem('list', JSON.stringify(items))
 }
 
 function removeFromLocalStorage(id) {
-
+  let items = getLocalStorage()
+  items = items.filter(item => {
+    if (item.id !== id) {
+      return item
+    }
+  })
+  localStorage.setItem('list', JSON.stringify(items))
 }
 
-function editLocalStorage(editId, value) {
-
+function editLocalStorage(id, value) {
+  let items = getLocalStorage()
+  items = items.map(item => {
+    if (item.id === id) {
+      item.value = value
+    }
+    return item
+  })
+  localStorage.setItem('list', JSON.stringify(items))
 }
+
+function getLocalStorage() {
+  return localStorage.getItem('list') 
+    ? JSON.parse(localStorage.getItem('list')) 
+    : [] 
+}
+
+// localStorage API
+// setItem
+// getItem
+// removeItem
+// save as strings
+
 // ****** SETUP ITEMS **********
+function setupItems () {
+  let items = getLocalStorage()
+  if (items.length > 0) {
+    items.forEach(item => {
+      createListItem(item.id, item.value)
+    })
+    container.classList.add('show-container')
+  }
+}
+
+function createListItem (id, value) {
+  const element = document.createElement('article')
+    element.classList.add('grocery-item')
+    const attribute = document.createAttribute('data-id')
+    attribute.value = id
+    element.setAttributeNode(attribute)
+    element.innerHTML = `<p class="title">${value}</p>
+    <div class="btn-container">
+      <button type="button" class="edit-btn"><i class="fas fa-edit"></i></button>
+      <button type="button" class="delete-btn"><i class="fas fa-trash"></i></button>
+    </div>`
+
+    // NOTE the event listeners for the delete and edit buttons do not exist on page load, therefore we must create the event listeners and query the variables within this section
+    const deleteBtn = element.querySelector('.delete-btn')
+    const editBtn = element.querySelector('.edit-btn')
+    deleteBtn.addEventListener('click', deleteItem)
+    editBtn.addEventListener('click', editItem)
+
+    // append child
+    list.appendChild(element)
+}
